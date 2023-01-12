@@ -1,0 +1,48 @@
+#!/bin/bash
+
+#################################################################################################
+#                               Script to install packages                                      #
+# V1.0 (Rob Rentenaar)  Initial version. Check if the package installed, if not install.        #
+# V2.0 (Rob Rentenaar)  Check if the correct repo is enabled.                                   #
+#                                                                                               #
+#################################################################################################
+
+## Variables
+REPO_SEARCH=epel
+REPO_ADD=epel-release
+PACKAGE=htop
+
+install_package () {
+## Check the exit status of the function "check_package". If the output is equel to 0 "Succes" the
+## package is installed
+rpm -qa | grep -iq "$PACKAGE"
+if [ $? -eq 0 ]
+then
+        ## The package is already installed, the script will exit
+        echo "$PACKAGE is already installed on $HOSTNAME"
+        exit 1
+else
+        ## The exit status of the function "check_package is not equel to 0, meaning
+        ## the package is not installed yet. Yum will install the package.
+        echo "$PACKAGE is being installed on $HOSTNAME"
+        ## Check if the needed repo is enabled, if not enable
+        yum repolist | grep -q "$REPO_SEARCH"
+                if [ $? -eq 0 ]
+                 then
+                  echo "$REPO_SEARCH is enabled"
+                 else
+                  echo "$REPO_SEARCH is being added on $HOSTNAME"
+                  yum -y config-manager --set-enabled powertools > /dev/null 2>&1
+                  yum -y install $REPO_ADD > /dev/null 2>&1
+                fi
+        echo "$PACKAGE is being installed $HOSTNAME"
+        yum -y install $PACKAGE > /dev/null 2>&1
+        echo "$REPO_SEARCH is being removed on $HOSTNAME"
+        yum -y remove $REPO_ADD > /dev/null 2>&1
+        echo "Yum cache is being cleaned on $HOSTNAME"
+        yum clean all > /dev/null 2>&1
+fi
+}
+
+## Execute the function
+install_package
