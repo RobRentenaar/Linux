@@ -1,0 +1,7 @@
+#!/bin/bash
+
+PKG="htop"
+
+rpm -qa | grep -iq $PKG
+
+if [ $? -eq 0 ] ; then echo "$PKG has been installed on $HOSTNAME" ; else echo "$PKG has not been installed $HOSTNAME" ; fi
