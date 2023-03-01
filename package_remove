@@ -1,0 +1,13 @@
+#!/bin/bash
+
+PKG="htop"
+
+rpm -qa | grep -iq $PKG
+
+if [ $? -eq 0 ]
+then
+        yum -y remove $PKG
+else
+        echo "Package not on $HOSTNAME"
+        exit 1
+fi
